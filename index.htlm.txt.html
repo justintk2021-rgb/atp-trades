@@ -1,0 +1,1908 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>ATP Trades – Journal & Notebook</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    /* ------------------ THEME TOKENS ------------------ */
+    :root {
+      --bg: #020617;
+      --bg-alt: #030712;
+      --sidebar-bg: radial-gradient(circle at top left, #0f172a 0, #020617 55%, #000 100%);
+      --card: rgba(15, 23, 42, 0.9);
+      --card-soft: rgba(15, 23, 42, 0.7);
+      --accent: #22c55e;
+      --accent-soft: rgba(34, 197, 94, 0.2);
+      --accent-red: #fb7185;
+      --accent-red-soft: rgba(248, 113, 113, 0.18);
+      --text: #f9fafb;
+      --text-subtle: #9ca3af;
+      --border: rgba(148, 163, 184, 0.25);
+      --shadow-soft: 0 18px 40px rgba(0, 0, 0, 0.6);
+      --radius-xl: 22px;
+      --radius-lg: 18px;
+      --radius-md: 12px;
+      --glass-blur: 18px;
+    }
+
+    body.theme-light {
+      --bg: #e5e7eb;
+      --bg-alt: #e5e7eb;
+      --sidebar-bg: radial-gradient(circle at top left, #eef2ff 0, #e5e7eb 55%, #d4d4d8 100%);
+      --card: rgba(248, 250, 252, 0.96);
+      --card-soft: rgba(248, 250, 252, 0.9);
+      --accent: #16a34a;
+      --accent-soft: rgba(22, 163, 74, 0.12);
+      --accent-red: #dc2626;
+      --accent-red-soft: rgba(239, 68, 68, 0.12);
+      --text: #020617;
+      --text-subtle: #6b7280;
+      --border: rgba(148, 163, 184, 0.4);
+      --shadow-soft: 0 10px 30px rgba(15, 23, 42, 0.18);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background:
+        radial-gradient(circle at 0% 0%, rgba(56, 189, 248, 0.08), transparent 55%),
+        radial-gradient(circle at 100% 100%, rgba(34, 197, 94, 0.08), transparent 55%),
+        var(--bg-alt);
+      color: var(--text);
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .layout {
+      display: flex;
+      min-height: 100vh;
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 18px 14px;
+      gap: 14px;
+    }
+
+    /* ------------------ SIDEBAR ------------------ */
+    .sidebar {
+      width: 240px;
+      background: var(--sidebar-bg);
+      border-radius: var(--radius-xl);
+      padding: 16px 16px 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      border: 1px solid rgba(15, 23, 42, 0.7);
+      box-shadow: var(--shadow-soft);
+    }
+
+    .sidebar-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .logo-box {
+      width: 42px;
+      height: 42px;
+      border-radius: 16px;
+      background:
+        radial-gradient(circle at 10% 0, #4ade80 0, transparent 55%),
+        radial-gradient(circle at 80% 100%, #22d3ee 0, transparent 60%),
+        #020617;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 0 18px rgba(34, 197, 94, 0.55);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .logo-box::before {
+      content: "";
+      width: 4px;
+      height: 22px;
+      border-radius: 999px;
+      background: #f9fafb;
+      box-shadow:
+        0 -9px 0 #22c55e,
+        0 9px 0 #22c55e;
+    }
+
+    .sidebar-title {
+      font-size: 1.05rem;
+      font-weight: 700;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+    }
+
+    .sidebar-sub {
+      font-size: 0.76rem;
+      color: var(--text-subtle);
+      margin-top: 2px;
+    }
+
+    .sidebar-section-title {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      color: var(--text-subtle);
+      margin-top: 6px;
+      margin-bottom: 4px;
+    }
+
+    .nav-list {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .nav-item {
+      padding: 8px 11px;
+      border-radius: 999px;
+      font-size: 0.84rem;
+      color: var(--text-subtle);
+      cursor: pointer;
+      border: 1px solid transparent;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      transition: 0.16s ease-out;
+      backdrop-filter: blur(10px);
+    }
+
+    .nav-item::after {
+      content: "›";
+      font-size: 0.8rem;
+      opacity: 0;
+      transform: translateX(-4px);
+      transition: 0.16s;
+    }
+
+    .nav-item.active {
+      background: linear-gradient(135deg, rgba(34, 197, 94, 0.18), rgba(59, 130, 246, 0.08));
+      border-color: rgba(34, 197, 94, 0.9);
+      color: #f9fafb;
+      box-shadow: 0 0 0 1px rgba(15, 23, 42, 0.7), 0 14px 30px rgba(15, 23, 42, 0.7);
+    }
+
+    .nav-item.active::after {
+      opacity: 1;
+      transform: translateX(0);
+    }
+
+    .nav-item:hover:not(.active) {
+      background: rgba(15, 23, 42, 0.8);
+      border-color: rgba(148, 163, 184, 0.4);
+      color: #e5e7eb;
+    }
+
+    .sidebar-footer {
+      margin-top: auto;
+      font-size: 0.72rem;
+      color: var(--text-subtle);
+      opacity: 0.92;
+    }
+
+    /* ------------------ MAIN ------------------ */
+    .main {
+      flex: 1;
+      display: flex;
+    }
+
+    .main-inner {
+      background:
+        radial-gradient(circle at 0 0, rgba(56, 189, 248, 0.09), transparent 55%),
+        radial-gradient(circle at 100% 100%, rgba(34, 197, 94, 0.08), transparent 55%),
+        linear-gradient(135deg, #020617, #020617);
+      border-radius: var(--radius-xl);
+      border: 1px solid rgba(15, 23, 42, 0.9);
+      min-height: 100%;
+      padding: 14px 14px 18px;
+      width: 100%;
+      box-shadow: var(--shadow-soft);
+      backdrop-filter: blur(24px);
+    }
+
+    .top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 10px;
+      margin-bottom: 12px;
+      border-bottom: 1px solid rgba(15, 23, 42, 0.85);
+    }
+
+    .top-title {
+      font-size: 1.05rem;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    .top-sub {
+      font-size: 0.8rem;
+      color: var(--text-subtle);
+      margin-top: 3px;
+    }
+
+    .top-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .chip {
+      padding: 6px 11px;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.5);
+      font-size: 0.76rem;
+      color: var(--text-subtle);
+      background: rgba(15, 23, 42, 0.9);
+      backdrop-filter: blur(10px);
+    }
+
+    .theme-toggle {
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.6);
+      background: radial-gradient(circle at 0 0, rgba(34,197,94,0.3), transparent 55%);
+      color: #e5e7eb;
+      padding: 6px 11px;
+      font-size: 0.78rem;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      box-shadow: 0 0 0 1px rgba(15, 23, 42, 0.9), 0 12px 24px rgba(15, 23, 42, 0.85);
+    }
+
+    body.theme-light .theme-toggle {
+      background: radial-gradient(circle at 0 0, rgba(250,250,250,0.85), transparent 55%);
+      color: #111827;
+    }
+
+    .theme-toggle span {
+      font-size: 0.9rem;
+    }
+
+    .page { display: none; }
+    .page.active { display: block; }
+
+    /* ------------------ CARDS ------------------ */
+    .card {
+      background: var(--card);
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border);
+      padding: 12px 14px 14px;
+      margin-bottom: 12px;
+      box-shadow: 0 18px 35px rgba(15, 23, 42, 0.8);
+      backdrop-filter: blur(var(--glass-blur));
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 10px;
+    }
+
+    .card-title {
+      font-size: 0.96rem;
+      font-weight: 600;
+    }
+
+    .card-sub {
+      font-size: 0.78rem;
+      color: var(--text-subtle);
+      margin-top: 3px;
+    }
+
+    .pill {
+      padding: 4px 9px;
+      border-radius: 999px;
+      font-size: 0.73rem;
+      border: 1px solid rgba(148, 163, 184, 0.6);
+      color: var(--text-subtle);
+      background: rgba(15, 23, 42, 0.8);
+      backdrop-filter: blur(10px);
+    }
+
+    /* ----------- EQUITY CHART CARD ---------- */
+    .equity-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+
+    .equity-meta-title {
+      font-size: 0.9rem;
+      font-weight: 600;
+    }
+
+    .equity-meta-sub {
+      font-size: 0.78rem;
+      color: var(--text-subtle);
+      margin-top: 2px;
+    }
+
+    .equity-metrics {
+      display: flex;
+      gap: 12px;
+      font-size: 0.78rem;
+    }
+
+    .equity-metric {
+      text-align: right;
+    }
+
+    .equity-label {
+      color: var(--text-subtle);
+      margin-bottom: 1px;
+    }
+
+    .equity-value {
+      font-weight: 600;
+      font-size: 0.9rem;
+    }
+
+    .equity-change-pos { color: var(--accent); }
+    .equity-change-neg { color: var(--accent-red); }
+
+    .equity-canvas-wrap {
+      width: 100%;
+      height: 230px;
+      border-radius: 18px;
+      overflow: hidden;
+      border: 1px solid rgba(30, 64, 175, 0.7);
+      background:
+        radial-gradient(circle at 0 0, rgba(34,197,94,0.2), transparent 55%),
+        radial-gradient(circle at 100% 100%, rgba(59,130,246,0.25), transparent 60%),
+        #020617;
+      box-shadow: 0 18px 40px rgba(15, 23, 42, 0.98);
+    }
+
+    #equity-canvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    /* ------------------ DASHBOARD STATS ------------------ */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0,1fr));
+      gap: 10px;
+    }
+    @media (max-width: 900px) {
+      .stats-grid { grid-template-columns: repeat(2, minmax(0,1fr)); }
+    }
+    @media (max-width: 650px) {
+      .stats-grid { grid-template-columns: minmax(0,1fr); }
+    }
+
+    .stat-card {
+      border-radius: var(--radius-md);
+      border: 1px solid rgba(148, 163, 184, 0.3);
+      padding: 9px 10px 10px;
+      background:
+        radial-gradient(circle at 0 0, rgba(34, 197, 94, 0.18), transparent 60%),
+        rgba(15, 23, 42, 0.95);
+      box-shadow: 0 12px 22px rgba(15, 23, 42, 0.9);
+    }
+
+    body.theme-light .stat-card {
+      background:
+        radial-gradient(circle at 0 0, rgba(34, 197, 94, 0.1), transparent 60%),
+        var(--card-soft);
+    }
+
+    .stat-label {
+      font-size: 0.72rem;
+      color: var(--text-subtle);
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      margin-bottom: 3px;
+    }
+
+    .stat-value { font-size: 1.16rem; font-weight: 600; }
+    .stat-note { font-size: 0.78rem; color: var(--text-subtle); margin-top: 2px; }
+    .stat-good { color: var(--accent); }
+    .stat-bad { color: var(--accent-red); }
+
+    /* ------------------ CALENDAR ------------------ */
+    .calendar-header {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      margin-bottom: 8px;
+      font-size: 0.86rem;
+    }
+
+    .calendar-month-label {
+      font-weight: 600;
+      padding: 4px 12px;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.6);
+      background: rgba(15, 23, 42, 0.9);
+      box-shadow: 0 10px 22px rgba(15, 23, 42, 0.9);
+    }
+
+    .cal-nav-btn {
+      width: 26px;
+      height: 26px;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.7);
+      background: rgba(15, 23, 42, 0.96);
+      color: var(--text-subtle);
+      font-size: 0.9rem;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 8px 18px rgba(15, 23, 42, 0.9);
+    }
+
+    .cal-nav-btn:hover {
+      background: rgba(34, 197, 94, 0.14);
+      color: #e5e7eb;
+      border-color: rgba(34, 197, 94, 0.9);
+    }
+
+    .calendar-grid {
+      display: grid;
+      grid-template-columns: repeat(7, minmax(0,1fr));
+      gap: 5px;
+      font-size: 0.78rem;
+    }
+
+    .calendar-day-name {
+      text-align: center;
+      color: var(--text-subtle);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      font-size: 0.7rem;
+      padding-bottom: 4px;
+    }
+
+    .calendar-cell {
+      min-height: 74px;
+      border-radius: 16px;
+      border: 1px solid rgba(51, 65, 85, 0.9);
+      padding: 5px 6px;
+      background: radial-gradient(circle at 0 0, rgba(15, 23, 42, 1), rgba(15, 23, 42, 0.92));
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      box-shadow: 0 12px 22px rgba(15, 23, 42, 0.9);
+    }
+
+    .calendar-date {
+      font-size: 0.73rem;
+      color: var(--text-subtle);
+    }
+
+    .calendar-pnl {
+      font-size: 0.78rem;
+      font-weight: 600;
+    }
+
+    .calendar-trades {
+      font-size: 0.72rem;
+      color: var(--text-subtle);
+    }
+
+    .calendar-pos {
+      background:
+        radial-gradient(circle at 0 0, rgba(34, 197, 94, 0.45), transparent 70%),
+        radial-gradient(circle at 100% 100%, rgba(45, 212, 191, 0.25), transparent 70%),
+        rgba(15, 23, 42, 0.96);
+      border-color: rgba(34, 197, 94, 0.9);
+      color: #bbf7d0;
+    }
+
+    .calendar-neg {
+      background:
+        radial-gradient(circle at 0 0, rgba(248, 113, 113, 0.5), transparent 70%),
+        radial-gradient(circle at 100% 100%, rgba(244, 114, 182, 0.3), transparent 70%),
+        rgba(15, 23, 42, 0.96);
+      border-color: rgba(248, 113, 113, 0.9);
+      color: #fee2e2;
+    }
+
+    .calendar-flat {
+      background:
+        radial-gradient(circle at 0 0, rgba(148, 163, 184, 0.45), transparent 70%),
+        rgba(15, 23, 42, 0.95);
+      border-color: rgba(148, 163, 184, 0.95);
+      color: #e5e7eb;
+    }
+
+    /* ------------------ GRID / FORMS ------------------ */
+    .page-grid {
+      display: grid;
+      grid-template-columns: minmax(0,1.05fr) minmax(0,1.35fr);
+      gap: 12px;
+    }
+    @media (max-width: 980px) {
+      .page-grid { grid-template-columns: minmax(0,1fr); }
+    }
+
+    form {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0,1fr));
+      gap: 8px 12px;
+      font-size: 0.88rem;
+      margin-top: 4px;
+    }
+    @media (max-width: 900px) {
+      form { grid-template-columns: minmax(0,1fr); }
+    }
+
+    label {
+      font-size: 0.76rem;
+      color: var(--text-subtle);
+      display: block;
+      margin-bottom: 3px;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      border-radius: 14px;
+      border: 1px solid rgba(51, 65, 85, 0.9);
+      background: rgba(15, 23, 42, 0.95);
+      color: var(--text);
+      padding: 7px 9px;
+      font-size: 0.9rem;
+      outline: none;
+      box-shadow: 0 8px 18px rgba(15, 23, 42, 0.95) inset;
+    }
+    body.theme-light input,
+    body.theme-light select,
+    body.theme-light textarea {
+      background: #f9fafb;
+      border-color: rgba(148, 163, 184, 0.7);
+      box-shadow: none;
+    }
+
+    input::placeholder,
+    textarea::placeholder {
+      color: rgba(148, 163, 184, 0.7);
+    }
+
+    input:focus, select:focus, textarea:focus {
+      border-color: rgba(34, 197, 94, 0.9);
+      box-shadow: 0 0 0 1px rgba(34, 197, 94, 0.5);
+    }
+
+    textarea { min-height: 70px; resize: vertical; }
+
+    .form-actions {
+      grid-column: 1 / -1;
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 4px;
+    }
+
+    .btn {
+      border-radius: 999px;
+      border: none;
+      padding: 8px 15px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.13em;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #22c55e, #4ade80);
+      color: #022c22;
+      box-shadow: 0 16px 30px rgba(34, 197, 94, 0.55);
+    }
+
+    .btn-outline {
+      background: transparent;
+      color: var(--text-subtle);
+      border: 1px solid rgba(148, 163, 184, 0.7);
+      backdrop-filter: blur(10px);
+    }
+
+    .btn-outline:hover {
+      border-color: rgba(34, 197, 94, 0.9);
+      color: #e5e7eb;
+    }
+
+    /* ------------------ TABLE ------------------ */
+    .table-shell {
+      border-radius: var(--radius-lg);
+      border: 1px solid rgba(30, 64, 175, 0.45);
+      overflow: hidden;
+      background: radial-gradient(circle at 0 0, rgba(59, 130, 246, 0.18), transparent 60%), rgba(15, 23, 42, 0.98);
+      font-size: 0.85rem;
+      box-shadow: 0 18px 32px rgba(15, 23, 42, 0.98);
+    }
+
+    .table-head {
+      display: grid;
+      grid-template-columns: 80px 100px 70px 80px 1.5fr 70px;
+      padding: 7px 10px;
+      background: rgba(15, 23, 42, 0.96);
+      border-bottom: 1px solid rgba(30, 64, 175, 0.7);
+      font-size: 0.73rem;
+      text-transform: uppercase;
+      letter-spacing: 0.11em;
+      color: var(--text-subtle);
+    }
+    @media (max-width: 850px) {
+      .table-head { display: none; }
+    }
+
+    .table-body { max-height: 320px; overflow-y: auto; }
+
+    .row {
+      display: grid;
+      grid-template-columns: 80px 100px 70px 80px 1.5fr 70px;
+      padding: 7px 10px;
+      border-bottom: 1px solid rgba(30, 41, 59, 0.85);
+    }
+    @media (max-width: 850px) {
+      .row {
+        grid-template-columns: 1fr 1fr;
+        row-gap: 4px;
+      }
+    }
+
+    .cell { padding-right: 6px; word-break: break-word; }
+
+    .cell-label {
+      display: none;
+      font-size: 0.72rem;
+      color: var(--text-subtle);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+    @media (max-width: 850px) {
+      .cell-label { display: inline; margin-right: 4px; }
+    }
+
+    .row:nth-child(odd) { background: rgba(15, 23, 42, 0.96); }
+    .row:nth-child(even) { background: rgba(15, 23, 42, 0.9); }
+
+    body.theme-light .row:nth-child(even) { background: #e5e7eb; }
+
+    .pl-positive { color: var(--accent); }
+    .pl-negative { color: var(--accent-red); }
+
+    .row-actions {
+      display: flex;
+      gap: 6px;
+      justify-content: flex-end;
+    }
+
+    .icon-btn {
+      width: 24px;
+      height: 24px;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.7);
+      background: rgba(15, 23, 42, 0.96);
+      color: var(--text-subtle);
+      font-size: 0.8rem;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .icon-btn:hover {
+      border-color: rgba(34, 197, 94, 0.9);
+      color: #e5e7eb;
+    }
+
+    /* ------------------ NOTEBOOK ------------------ */
+    .notebook-layout {
+      display: grid;
+      grid-template-columns: minmax(0,0.8fr) minmax(0,1.4fr);
+      gap: 12px;
+    }
+    @media (max-width: 900px) {
+      .notebook-layout { grid-template-columns: minmax(0,1fr); }
+    }
+
+    .nb-list {
+      border-radius: var(--radius-lg);
+      border: 1px solid rgba(30, 64, 175, 0.4);
+      background: radial-gradient(circle at 0 0, rgba(96, 165, 250, 0.12), transparent 65%), rgba(15, 23, 42, 0.98);
+      display: flex;
+      flex-direction: column;
+      height: 260px;
+      overflow: hidden;
+      box-shadow: 0 15px 30px rgba(15, 23, 42, 0.98);
+    }
+
+    .nb-list-header {
+      padding: 8px 10px;
+      border-bottom: 1px solid rgba(30, 64, 175, 0.7);
+      font-size: 0.78rem;
+      color: var(--text-subtle);
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .nb-list-body {
+      flex: 1;
+      overflow-y: auto;
+      padding: 4px;
+    }
+
+    .nb-item {
+      border-radius: 12px;
+      padding: 6px 8px;
+      margin-bottom: 4px;
+      border: 1px solid transparent;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 0.8rem;
+      cursor: pointer;
+      background: rgba(15, 23, 42, 0.96);
+    }
+
+    .nb-item-main {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .nb-item-date { font-weight: 500; }
+    .nb-item-meta { font-size: 0.74rem; color: var(--text-subtle); }
+
+    .nb-item-pl { font-size: 0.78rem; font-weight: 600; }
+    .nb-item.pl-pos { color: var(--accent); }
+    .nb-item.pl-neg { color: var(--accent-red); }
+
+    .nb-item:hover {
+      background: radial-gradient(circle at 0 0, rgba(34, 197, 94, 0.35), transparent 70%), rgba(15, 23, 42, 0.98);
+      border-color: rgba(34, 197, 94, 0.9);
+    }
+
+    .nb-item.active {
+      background:
+        radial-gradient(circle at 0 0, rgba(34, 197, 94, 0.45), transparent 70%),
+        radial-gradient(circle at 100% 100%, rgba(45, 212, 191, 0.35), transparent 70%),
+        rgba(15, 23, 42, 0.98);
+      border-color: rgba(34, 197, 94, 0.9);
+      box-shadow: 0 12px 22px rgba(15, 23, 42, 0.95);
+    }
+
+    .nb-editor-shell {
+      border-radius: var(--radius-lg);
+      border: 1px solid rgba(30, 64, 175, 0.4);
+      background:
+        radial-gradient(circle at 0 0, rgba(37, 99, 235, 0.24), transparent 60%),
+        rgba(15, 23, 42, 0.98);
+      padding: 8px 9px 10px;
+      display: flex;
+      flex-direction: column;
+      height: 260px;
+      box-shadow: 0 16px 32px rgba(15, 23, 42, 0.98);
+    }
+
+    .nb-header-line {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 10px;
+      margin-bottom: 6px;
+    }
+
+    .nb-title {
+      font-size: 0.9rem;
+      font-weight: 600;
+    }
+
+    .nb-sub {
+      font-size: 0.76rem;
+      color: var(--text-subtle);
+      margin-top: 2px;
+    }
+
+    .nb-pl-chip {
+      border-radius: 999px;
+      padding: 3px 9px;
+      font-size: 0.78rem;
+      border: 1px solid rgba(148, 163, 184, 0.7);
+      background: rgba(15, 23, 42, 0.96);
+    }
+
+    .nb-pl-positive {
+      color: var(--accent);
+      border-color: rgba(34, 197, 94, 0.85);
+      background: var(--accent-soft);
+    }
+    .nb-pl-negative {
+      color: var(--accent-red);
+      border-color: rgba(248, 113, 113, 0.9);
+      background: var(--accent-red-soft);
+    }
+
+    .nb-toolbar {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 6px;
+    }
+
+    .nb-tool-btn {
+      width: 26px;
+      height: 24px;
+      border-radius: 7px;
+      border: 1px solid rgba(30, 64, 175, 0.7);
+      background: rgba(15, 23, 42, 0.96);
+      color: var(--text-subtle);
+      font-size: 0.75rem;
+      cursor: pointer;
+    }
+
+    .nb-tool-btn:hover {
+      border-color: rgba(34, 197, 94, 0.9);
+      color: #e5e7eb;
+    }
+
+    .nb-badges {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 6px;
+      font-size: 0.74rem;
+    }
+
+    .nb-badge {
+      padding: 3px 8px;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.7);
+      color: var(--text-subtle);
+      background: rgba(15, 23, 42, 0.96);
+    }
+
+    .nb-editor {
+      flex: 1;
+      border-radius: 14px;
+      border: 1px dashed rgba(148, 163, 184, 0.8);
+      padding: 8px 9px;
+      font-size: 0.84rem;
+      overflow-y: auto;
+      background: rgba(15, 23, 42, 0.9);
+    }
+
+    .nb-editor:focus-visible {
+      outline: none;
+      border-style: solid;
+      border-color: rgba(34, 197, 94, 0.9);
+      box-shadow: 0 0 0 1px rgba(34, 197, 94, 0.6);
+    }
+
+    .nb-placeholder {
+      color: var(--text-subtle);
+    }
+
+    .nb-footer {
+      display: flex;
+      justify-content: flex-end;
+      margin-top: 6px;
+    }
+
+    .nb-empty {
+      margin-top: 4px;
+      font-size: 0.8rem;
+      color: var(--text-subtle);
+    }
+
+    /* ------------------ RESPONSIVE LAYOUT ------------------ */
+    @media (max-width: 900px) {
+      .layout {
+        flex-direction: column;
+        padding: 10px;
+      }
+      .sidebar {
+        width: 100%;
+        flex-direction: row;
+        align-items: center;
+        padding: 10px 12px;
+        gap: 12px;
+      }
+      .sidebar-header {
+        flex: none;
+      }
+      .sidebar-section-title,
+      .sidebar-footer {
+        display: none;
+      }
+      .nav-list {
+        flex-direction: row;
+        flex: 1;
+        justify-content: flex-end;
+      }
+      .nav-item {
+        min-width: 90px;
+        justify-content: center;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="layout">
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <div class="logo-box"></div>
+        <div>
+          <div class="sidebar-title">ATP Trades</div>
+          <div class="sidebar-sub">Personal journal</div>
+        </div>
+      </div>
+
+      <div style="flex:1;display:flex;flex-direction:column;margin-top:6px;">
+        <div class="sidebar-section-title">Navigation</div>
+        <div class="nav-list">
+          <div class="nav-item active" id="nav-dashboard">Dashboard</div>
+          <div class="nav-item" id="nav-journal">Journal</div>
+          <div class="nav-item" id="nav-notebook">Notebook</div>
+        </div>
+      </div>
+
+      <div class="sidebar-footer">
+        Data is stored locally in your browser using localStorage.
+      </div>
+    </aside>
+
+    <!-- MAIN -->
+    <main class="main">
+      <div class="main-inner">
+        <div class="top-bar">
+          <div>
+            <div class="top-title" id="top-title">Dashboard</div>
+            <div class="top-sub" id="top-sub">Overview of your trades.</div>
+          </div>
+          <div class="top-actions">
+            <div class="chip">ATP • Private</div>
+            <button id="theme-toggle" class="theme-toggle">
+              <span>🌙</span> <span>Dark</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- DASHBOARD PAGE -->
+        <section id="page-dashboard" class="page active">
+
+          <!-- Account growth chart card -->
+          <section class="card">
+            <div class="equity-header">
+              <div>
+                <div class="equity-meta-title">Account growth</div>
+                <div class="equity-meta-sub">
+                  Fake candle chart built from your trades’ PnL (per trade sequence).
+                </div>
+              </div>
+              <div style="display:flex;align-items:flex-start;gap:10px;">
+                <div class="equity-metrics">
+                  <div class="equity-metric">
+                    <div class="equity-label">Start</div>
+                    <div class="equity-value" id="equity-start">$10,000.00</div>
+                  </div>
+                  <div class="equity-metric">
+                    <div class="equity-label">Balance</div>
+                    <div class="equity-value" id="equity-balance">$10,000.00</div>
+                  </div>
+                  <div class="equity-metric">
+                    <div class="equity-label">Change</div>
+                    <div class="equity-value" id="equity-change">0.00</div>
+                  </div>
+                </div>
+                <button id="balance-edit"
+                        class="btn btn-outline"
+                        style="padding:4px 10px;font-size:0.7rem;letter-spacing:0.08em;margin-left:8px;">
+                  Set balance
+                </button>
+              </div>
+            </div>
+
+            <div class="equity-canvas-wrap">
+              <canvas id="equity-canvas"></canvas>
+            </div>
+          </section>
+
+          <!-- Stats card -->
+          <section class="card">
+            <div class="card-header">
+              <div>
+                <div class="card-title">Performance snapshot</div>
+                <div class="card-sub">Summary of your trading performance.</div>
+              </div>
+              <span class="pill">Overview</span>
+            </div>
+
+            <div class="stats-grid">
+              <div class="stat-card">
+                <div class="stat-label">Total trades</div>
+                <div class="stat-value" id="stat-total">0</div>
+                <div class="stat-note">Number of trades logged.</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-label">Win rate</div>
+                <div class="stat-value" id="stat-winrate">0%</div>
+                <div class="stat-note">
+                  Wins: <span id="stat-wins">0</span> • Losses: <span id="stat-losses">0</span>
+                </div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-label">Net P/L</div>
+                <div class="stat-value" id="stat-net">0.00</div>
+                <div class="stat-note">Total P/L across all trades.</div>
+              </div>
+            </div>
+          </section>
+
+          <!-- Calendar card -->
+          <section class="card">
+            <div class="card-header">
+              <div>
+                <div class="card-title">PnL calendar</div>
+                <div class="card-sub">Net PnL per day for the selected month.</div>
+              </div>
+              <span class="pill">Calendar</span>
+            </div>
+
+            <div class="calendar-header">
+              <button class="cal-nav-btn" id="cal-prev">‹</button>
+              <span class="calendar-month-label" id="cal-month-label"></span>
+              <button class="cal-nav-btn" id="cal-next">›</button>
+            </div>
+
+            <div class="calendar-grid" id="cal-grid"></div>
+          </section>
+        </section>
+
+        <!-- JOURNAL PAGE -->
+        <section id="page-journal" class="page">
+          <div class="page-grid">
+            <section class="card">
+              <div class="card-header">
+                <div>
+                  <div class="card-title">New / edit trade</div>
+                  <div class="card-sub">Log each trade with quick context.</div>
+                </div>
+                <span class="pill">Journal</span>
+              </div>
+
+              <form id="trade-form">
+                <div>
+                  <label for="date">Date</label>
+                  <input type="date" id="date" required />
+                </div>
+                <div>
+                  <label for="pair">Pair / asset</label>
+                  <input type="text" id="pair" placeholder="XAUUSD, EURUSD..." required />
+                </div>
+                <div>
+                  <label for="direction">Direction</label>
+                  <select id="direction">
+                    <option value="Long">Long</option>
+                    <option value="Short">Short</option>
+                  </select>
+                </div>
+                <div>
+                  <label for="result">Result (P/L)</label>
+                  <input type="number" id="result" step="0.01" placeholder="e.g. 45.5 or -20" required />
+                </div>
+                <div>
+                  <label for="session">Session (optional)</label>
+                  <input type="text" id="session" placeholder="London, NY, Asia..." />
+                </div>
+                <div>
+                  <label for="strategy">Setup / strategy</label>
+                  <input type="text" id="strategy" placeholder="ATP break &amp; retest..." />
+                </div>
+                <div style="grid-column:1 / -1;">
+                  <label for="notes">Quick notes</label>
+                  <textarea id="notes" placeholder="Short note about the trade..."></textarea>
+                </div>
+
+                <div class="form-actions">
+                  <button type="button" id="clear-all" class="btn btn-outline">Clear all trades</button>
+                  <div style="display:flex;gap:6px;">
+                    <button type="button" id="cancel-edit" class="btn btn-outline" style="display:none;">Cancel</button>
+                    <button type="submit" class="btn btn-primary">
+                      <span id="submit-label">+ Add trade</span>
+                    </button>
+                  </div>
+                </div>
+              </form>
+            </section>
+
+            <section class="card">
+              <div class="card-header">
+                <div>
+                  <div class="card-title">Trade log</div>
+                  <div class="card-sub">Click a row to open detailed notes in the Notebook.</div>
+                </div>
+                <span class="pill">History</span>
+              </div>
+
+              <div class="table-shell">
+                <div class="table-head">
+                  <div>Date</div>
+                  <div>Pair</div>
+                  <div>Side</div>
+                  <div>P/L</div>
+                  <div>Notes</div>
+                  <div>Actions</div>
+                </div>
+                <div class="table-body" id="trade-rows"></div>
+              </div>
+            </section>
+          </div>
+        </section>
+
+        <!-- NOTEBOOK PAGE -->
+        <section id="page-notebook" class="page">
+          <section class="card">
+            <div class="card-header">
+              <div>
+                <div class="card-title">Notebook</div>
+                <div class="card-sub">Notion-style notes per trade (uses the same trades as your Journal).</div>
+              </div>
+              <span class="pill">Notes</span>
+            </div>
+
+            <div class="notebook-layout">
+              <div class="nb-list">
+                <div class="nb-list-header">
+                  <span><strong>Trades</strong></span>
+                  <span style="font-size:0.72rem;">Select one →</span>
+                </div>
+                <div class="nb-list-body" id="nb-list"></div>
+              </div>
+
+              <div class="nb-editor-shell">
+                <div class="nb-header-line">
+                  <div>
+                    <div class="nb-title" id="nb-title">No trade selected</div>
+                    <div class="nb-sub" id="nb-sub">Choose a trade on the left.</div>
+                  </div>
+                  <div class="nb-pl-chip" id="nb-pl-chip">P/L 0.00</div>
+                </div>
+
+                <div class="nb-badges" id="nb-badges"></div>
+
+                <div class="nb-toolbar">
+                  <button class="nb-tool-btn" data-cmd="bold">B</button>
+                  <button class="nb-tool-btn" data-cmd="insertUnorderedList">•</button>
+                  <button class="nb-tool-btn" data-cmd="formatBlock" data-value="h3">H</button>
+                </div>
+
+                <div class="nb-editor" id="nb-editor" contenteditable="true">
+                  <div class="nb-placeholder">
+                    Once a trade is selected, write your detailed notes here.
+                  </div>
+                </div>
+
+                <div class="nb-footer">
+                  <button type="button" class="btn btn-primary" id="save-notes">Save notes</button>
+                </div>
+                <div class="nb-empty" id="nb-empty">No trades yet. Add one in the Journal.</div>
+              </div>
+            </div>
+          </section>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    // ---------------- CONFIG ----------------
+    var STORAGE_KEY = "atp_trades_v1";
+    var THEME_KEY   = "atp_theme_pref";
+
+    var START_BALANCE_KEY = "atp_start_balance";
+    var START_BALANCE_DEFAULT = 10000;
+
+    function getStartBalance() {
+      var v = parseFloat(localStorage.getItem(START_BALANCE_KEY));
+      if (isNaN(v)) return START_BALANCE_DEFAULT;
+      return v;
+    }
+
+    var START_BALANCE = getStartBalance();
+
+    // ---------------- NAV -------------------
+    var navDashboard = document.getElementById("nav-dashboard");
+    var navJournal   = document.getElementById("nav-journal");
+    var navNotebook  = document.getElementById("nav-notebook");
+
+    var pageDashboard = document.getElementById("page-dashboard");
+    var pageJournal   = document.getElementById("page-journal");
+    var pageNotebook  = document.getElementById("page-notebook");
+
+    var topTitle = document.getElementById("top-title");
+    var topSub   = document.getElementById("top-sub");
+
+    function setPage(page) {
+      pageDashboard.classList.remove("active");
+      pageJournal.classList.remove("active");
+      pageNotebook.classList.remove("active");
+      navDashboard.classList.remove("active");
+      navJournal.classList.remove("active");
+      navNotebook.classList.remove("active");
+
+      if (page === "dashboard") {
+        pageDashboard.classList.add("active");
+        navDashboard.classList.add("active");
+        topTitle.textContent = "Dashboard";
+        topSub.textContent = "Overview of your trades.";
+      } else if (page === "journal") {
+        pageJournal.classList.add("active");
+        navJournal.classList.add("active");
+        topTitle.textContent = "Journal";
+        topSub.textContent = "Log and edit your trades.";
+      } else {
+        pageNotebook.classList.add("active");
+        navNotebook.classList.add("active");
+        topTitle.textContent = "Notebook";
+        topSub.textContent = "Detailed notes per trade.";
+      }
+    }
+
+    navDashboard.onclick = function(){ setPage("dashboard"); };
+    navJournal.onclick   = function(){ setPage("journal"); };
+    navNotebook.onclick  = function(){ setPage("notebook"); };
+
+    // ---------------- THEME -----------------
+    var themeToggle = document.getElementById("theme-toggle");
+    function applyTheme(theme) {
+      var label = themeToggle.querySelectorAll("span")[1];
+      var icon  = themeToggle.querySelectorAll("span")[0];
+      if (theme === "light") {
+        document.body.classList.add("theme-light");
+        if (label) label.textContent = "Light";
+        if (icon) icon.textContent = "☀️";
+      } else {
+        document.body.classList.remove("theme-light");
+        if (label) label.textContent = "Dark";
+        if (icon) icon.textContent = "🌙";
+      }
+    }
+    var currentTheme = localStorage.getItem(THEME_KEY) === "light" ? "light" : "dark";
+    applyTheme(currentTheme);
+    themeToggle.onclick = function() {
+      currentTheme = currentTheme === "dark" ? "light" : "dark";
+      localStorage.setItem(THEME_KEY, currentTheme);
+      applyTheme(currentTheme);
+    };
+
+    // ---------------- DATA ------------------
+    function loadTrades() {
+      try {
+        var raw = localStorage.getItem(STORAGE_KEY);
+        return raw ? JSON.parse(raw) : [];
+      } catch(e) {
+        return [];
+      }
+    }
+    function saveTrades(list) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
+    }
+
+    var trades = loadTrades();
+    var editingId = null;
+    var selectedTradeId = trades.length ? trades[0].id : null;
+
+    // ---------------- FORM ------------------
+    var form = document.getElementById("trade-form");
+    var dateInput = document.getElementById("date");
+    var pairInput = document.getElementById("pair");
+    var directionInput = document.getElementById("direction");
+    var resultInput = document.getElementById("result");
+    var sessionInput = document.getElementById("session");
+    var strategyInput = document.getElementById("strategy");
+    var notesInput = document.getElementById("notes");
+    var submitLabel = document.getElementById("submit-label");
+    var cancelEditBtn = document.getElementById("cancel-edit");
+    var clearAllBtn = document.getElementById("clear-all");
+    var rowsContainer = document.getElementById("trade-rows");
+
+    if (dateInput) {
+      dateInput.value = new Date().toISOString().slice(0,10);
+    }
+
+    function formatNumber(n) {
+      return Number(n).toFixed(2);
+    }
+
+    // ------------- DASHBOARD STATS ----------
+    function renderStats() {
+      var total = trades.length;
+      var wins = 0, losses = 0, net = 0;
+
+      for (var i=0; i<trades.length; i++) {
+        var pl = Number(trades[i].result) || 0;
+        net += pl;
+        if (pl > 0) wins++;
+        else if (pl < 0) losses++;
+      }
+      var winrate = total ? Math.round((wins / total) * 100) : 0;
+
+      document.getElementById("stat-total").textContent = total;
+      document.getElementById("stat-wins").textContent = wins;
+      document.getElementById("stat-losses").textContent = losses;
+
+      var statNet = document.getElementById("stat-net");
+      statNet.textContent = formatNumber(net);
+      statNet.classList.remove("stat-good","stat-bad");
+      if (net > 0) statNet.classList.add("stat-good");
+      if (net < 0) statNet.classList.add("stat-bad");
+      var statWinrate = document.getElementById("stat-winrate");
+      statWinrate.textContent = winrate + "%";
+    }
+
+    // ------------- TABLE ROWS ---------------
+    function renderRows() {
+      rowsContainer.innerHTML = "";
+      if (!trades.length) {
+        var empty = document.createElement("div");
+        empty.style.padding = "10px";
+        empty.style.fontSize = "0.84rem";
+        empty.style.color = "#9ca3af";
+        empty.textContent = "No trades yet. Add one using the form.";
+        rowsContainer.appendChild(empty);
+        return;
+      }
+
+      for (var i=0; i<trades.length; i++) {
+        (function(t){
+          var row = document.createElement("div");
+          row.className = "row";
+
+          var pl = Number(t.result) || 0;
+          var plClass = pl > 0 ? "pl-positive" : pl < 0 ? "pl-negative" : "";
+
+          row.innerHTML =
+            '<div class="cell"><span class="cell-label">Date</span><span>'+ (t.date||"-") +'</span></div>' +
+            '<div class="cell"><span class="cell-label">Pair</span><span>'+ (t.pair||"-") +'</span></div>' +
+            '<div class="cell"><span class="cell-label">Side</span><span>'+ (t.direction||"-") +'</span></div>' +
+            '<div class="cell '+plClass+'"><span class="cell-label">P/L</span><span>'+ formatNumber(pl) +'</span></div>' +
+            '<div class="cell"><span class="cell-label">Notes</span><span>'+
+              (t.notes ? t.notes : '<span style="color:#6b7280;">No notes</span>') +
+            '</span></div>' +
+            '<div class="cell"><div class="row-actions">' +
+            '<button class="icon-btn edit" title="Edit">✎</button>' +
+            '<button class="icon-btn delete" title="Delete">×</button>' +
+            '</div></div>';
+
+          row.onclick = function() {
+            selectedTradeId = t.id;
+            setPage("notebook");
+            renderNotebook();
+          };
+
+          var editBtn = row.querySelector(".edit");
+          var deleteBtn = row.querySelector(".delete");
+          editBtn.onclick = function(e) {
+            e.stopPropagation();
+            enterEditMode(t);
+          };
+          deleteBtn.onclick = function(e) {
+            e.stopPropagation();
+            deleteTrade(t.id);
+          };
+
+          rowsContainer.appendChild(row);
+        })(trades[i]);
+      }
+    }
+
+    function addTrade(trade) {
+      trades.unshift(trade);
+      saveTrades(trades);
+      selectedTradeId = trade.id;
+      renderAll();
+    }
+
+    function updateTrade(id, data) {
+      for (var i=0;i<trades.length;i++) {
+        if (trades[i].id === id) {
+          for (var k in data) {
+            if (data.hasOwnProperty(k)) trades[i][k] = data[k];
+          }
+          break;
+        }
+      }
+      saveTrades(trades);
+      renderAll();
+    }
+
+    function deleteTrade(id) {
+      trades = trades.filter(function(t){ return t.id !== id; });
+      saveTrades(trades);
+      if (selectedTradeId === id) {
+        selectedTradeId = trades.length ? trades[0].id : null;
+      }
+      renderAll();
+    }
+
+    function clearAllTrades() {
+      if (!confirm("Delete ALL trades?")) return;
+      trades = [];
+      saveTrades(trades);
+      selectedTradeId = null;
+      renderAll();
+    }
+
+    function enterEditMode(t) {
+      editingId = t.id;
+      setPage("journal");
+      dateInput.value = t.date || "";
+      pairInput.value = t.pair || "";
+      directionInput.value = t.direction || "Long";
+      resultInput.value = t.result || "";
+      sessionInput.value = t.session || "";
+      strategyInput.value = t.strategy || "";
+      notesInput.value = t.notes || "";
+      submitLabel.textContent = "Save changes";
+      cancelEditBtn.style.display = "inline-flex";
+    }
+
+    function exitEditMode() {
+      editingId = null;
+      form.reset();
+      if (dateInput) dateInput.value = new Date().toISOString().slice(0,10);
+      directionInput.value = "Long";
+      submitLabel.textContent = "+ Add trade";
+      cancelEditBtn.style.display = "none";
+    }
+
+    cancelEditBtn.onclick = exitEditMode;
+    clearAllBtn.onclick = clearAllTrades;
+
+    form.onsubmit = function(e) {
+      e.preventDefault();
+      var data = {
+        date: dateInput.value || new Date().toISOString().slice(0,10),
+        pair: pairInput.value.trim(),
+        direction: directionInput.value,
+        result: resultInput.value,
+        session: sessionInput.value.trim(),
+        strategy: strategyInput.value.trim(),
+        notes: notesInput.value.trim()
+      };
+
+      if (editingId) {
+        updateTrade(editingId, data);
+        exitEditMode();
+      } else {
+        data.id = Date.now().toString();
+        data.notebook = "";
+        addTrade(data);
+        form.reset();
+        if (dateInput) dateInput.value = new Date().toISOString().slice(0,10);
+        directionInput.value = "Long";
+      }
+    };
+
+    // ------------- NOTEBOOK ------------------
+    var nbList = document.getElementById("nb-list");
+    var nbTitle = document.getElementById("nb-title");
+    var nbSub   = document.getElementById("nb-sub");
+    var nbPlChip = document.getElementById("nb-pl-chip");
+    var nbBadges = document.getElementById("nb-badges");
+    var nbEditor = document.getElementById("nb-editor");
+    var saveNotesBtn = document.getElementById("save-notes");
+    var nbEmpty = document.getElementById("nb-empty");
+
+    function renderNotebook() {
+      nbList.innerHTML = "";
+      nbBadges.innerHTML = "";
+
+      if (!trades.length) {
+        nbTitle.textContent = "No trades yet";
+        nbSub.textContent = "Add a trade in the Journal to start.";
+        nbPlChip.textContent = "P/L 0.00";
+        nbPlChip.className = "nb-pl-chip";
+        nbEditor.innerHTML = '<div class="nb-placeholder">Nothing to show yet.</div>';
+        nbEmpty.style.display = "block";
+        return;
+      }
+      nbEmpty.style.display = "none";
+
+      if (!selectedTradeId) {
+        selectedTradeId = trades[0].id;
+      }
+
+      for (var i=0; i<trades.length; i++) {
+        (function(t){
+          var item = document.createElement("div");
+          item.className = "nb-item";
+          if (t.id === selectedTradeId) item.classList.add("active");
+          var pl = Number(t.result) || 0;
+          var plClass = pl > 0 ? "pl-pos" : pl < 0 ? "pl-neg" : "";
+
+          item.innerHTML =
+            '<div class="nb-item-main">' +
+              '<span class="nb-item-date">'+ (t.date || "-") +'</span>' +
+              '<span class="nb-item-meta">'+ (t.pair||"-") +' • '+ (t.direction||"-") +'</span>' +
+            '</div>' +
+            '<span class="nb-item-pl '+plClass+'">'+ (pl>0?"+":"") + formatNumber(pl) +'</span>';
+
+          item.onclick = function() {
+            selectedTradeId = t.id;
+            renderNotebook();
+          };
+
+          nbList.appendChild(item);
+        })(trades[i]);
+      }
+
+      var trade = null;
+      for (var j=0;j<trades.length;j++){
+        if (trades[j].id === selectedTradeId) { trade = trades[j]; break; }
+      }
+      if (!trade) return;
+
+      var plNum = Number(trade.result) || 0;
+      nbTitle.textContent = (trade.pair || "Asset") + " • " + (trade.date || "-");
+      nbSub.textContent = "Direction: " + (trade.direction || "-") + " • Session: " + (trade.session||"n/a");
+      nbPlChip.textContent = "P/L " + (plNum>0?"+":"") + formatNumber(plNum);
+      nbPlChip.className = "nb-pl-chip";
+      if (plNum>0) nbPlChip.classList.add("nb-pl-positive");
+      else if (plNum<0) nbPlChip.classList.add("nb-pl-negative");
+
+      var b1 = document.createElement("div");
+      b1.className = "nb-badge";
+      b1.textContent = "Setup: " + (trade.strategy || "n/a");
+      nbBadges.appendChild(b1);
+
+      if (trade.notebook && trade.notebook.trim() !== "") {
+        nbEditor.innerHTML = trade.notebook;
+      } else {
+        nbEditor.innerHTML =
+          "<h3>📋 Plan</h3><ul><li>Why did I take this trade?</li></ul>" +
+          "<h3>⚙ Execution</h3><ul><li>Entry, management, exit.</li></ul>" +
+          "<h3>🧠 Review</h3><ul><li>What did I learn?</li></ul>";
+      }
+    }
+
+    document.querySelectorAll(".nb-tool-btn").forEach(function(btn){
+      btn.onclick = function() {
+        var cmd = btn.getAttribute("data-cmd");
+        var val = btn.getAttribute("data-value") || null;
+        nbEditor.focus();
+        try { document.execCommand(cmd, false, val); } catch(e){}
+      };
+    });
+
+    saveNotesBtn.onclick = function() {
+      if (!selectedTradeId) return;
+      for (var i=0;i<trades.length;i++) {
+        if (trades[i].id === selectedTradeId) {
+          trades[i].notebook = nbEditor.innerHTML;
+          break;
+        }
+      }
+      saveTrades(trades);
+      alert("Notes saved for this trade.");
+    };
+
+    // ------------- CALENDAR ------------------
+    var calGrid = document.getElementById("cal-grid");
+    var calMonthLabel = document.getElementById("cal-month-label");
+    var calPrev = document.getElementById("cal-prev");
+    var calNext = document.getElementById("cal-next");
+
+    var currentMonthDate = new Date();
+    currentMonthDate = new Date(currentMonthDate.getFullYear(), currentMonthDate.getMonth(), 1);
+
+    function getDailyStats() {
+      var map = {};
+      for (var i = 0; i < trades.length; i++) {
+        var t = trades[i];
+        if (!t.date) continue;
+        var pl = Number(t.result) || 0;
+        if (!map[t.date]) {
+          map[t.date] = { pnl: 0, trades: 0 };
+        }
+        map[t.date].pnl += pl;
+        map[t.date].trades += 1;
+      }
+      return map;
+    }
+
+    function renderCalendar() {
+      if (!calGrid || !calMonthLabel) return;
+
+      var year = currentMonthDate.getFullYear();
+      var month = currentMonthDate.getMonth();
+
+      var monthNames = [
+        "January","February","March","April","May","June",
+        "July","August","September","October","November","December"
+      ];
+      calMonthLabel.textContent = monthNames[month] + " " + year;
+
+      var dailyStats = getDailyStats();
+
+      calGrid.innerHTML = "";
+
+      var dayNames = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+      for (var d = 0; d < dayNames.length; d++) {
+        var dn = document.createElement("div");
+        dn.className = "calendar-day-name";
+        dn.textContent = dayNames[d];
+        calGrid.appendChild(dn);
+      }
+
+      var firstDayIndex = new Date(year, month, 1).getDay();
+      var daysInMonth = new Date(year, month + 1, 0).getDate();
+
+      for (var i = 0; i < firstDayIndex; i++) {
+        var empty = document.createElement("div");
+        calGrid.appendChild(empty);
+      }
+
+      for (var day = 1; day <= daysInMonth; day++) {
+        var dObj = new Date(year, month, day);
+        var yyyy = dObj.getFullYear();
+        var mm = String(dObj.getMonth() + 1).padStart(2, "0");
+        var dd = String(day).padStart(2, "0");
+        var key = yyyy + "-" + mm + "-" + dd;
+        var stat = dailyStats[key];
+
+        var cell = document.createElement("div");
+        cell.className = "calendar-cell";
+
+        var dateSpan = document.createElement("div");
+        dateSpan.className = "calendar-date";
+        dateSpan.textContent = day;
+        cell.appendChild(dateSpan);
+
+        if (stat) {
+          var pnl = stat.pnl;
+          var pnlDiv = document.createElement("div");
+          pnlDiv.className = "calendar-pnl";
+          pnlDiv.textContent = (pnl > 0 ? "+" : "") + formatNumber(pnl);
+
+          var tradesDiv = document.createElement("div");
+          tradesDiv.className = "calendar-trades";
+          tradesDiv.textContent = stat.trades + " trade" + (stat.trades === 1 ? "" : "s");
+
+          if (pnl > 0) cell.classList.add("calendar-pos");
+          else if (pnl < 0) cell.classList.add("calendar-neg");
+          else cell.classList.add("calendar-flat");
+
+          cell.appendChild(pnlDiv);
+          cell.appendChild(tradesDiv);
+        }
+
+        calGrid.appendChild(cell);
+      }
+    }
+
+    if (calPrev && calNext) {
+      calPrev.onclick = function() {
+        currentMonthDate = new Date(
+          currentMonthDate.getFullYear(),
+          currentMonthDate.getMonth() - 1,
+          1
+        );
+        renderCalendar();
+      };
+      calNext.onclick = function() {
+        currentMonthDate = new Date(
+          currentMonthDate.getFullYear(),
+          currentMonthDate.getMonth() + 1,
+          1
+        );
+        renderCalendar();
+      };
+    }
+
+    // ------------- EQUITY CHART -------------
+    var equityCanvas = document.getElementById("equity-canvas");
+    var equityStartEl   = document.getElementById("equity-start");
+    var equityBalanceEl = document.getElementById("equity-balance");
+    var equityChangeEl  = document.getElementById("equity-change");
+    var balanceEditBtn  = document.getElementById("balance-edit");
+
+    if (balanceEditBtn) {
+      balanceEditBtn.onclick = function () {
+        var current = START_BALANCE || START_BALANCE_DEFAULT;
+        var input = prompt("Enter starting balance:", current);
+        if (input === null) return;
+
+        var v = parseFloat(input);
+        if (isNaN(v)) {
+          alert("Please enter a valid number.");
+          return;
+        }
+
+        localStorage.setItem(START_BALANCE_KEY, v);
+        START_BALANCE = v;
+        renderAll();
+      };
+    }
+
+    function getEquitySeries() {
+      var sorted = trades.slice().sort(function(a,b){
+        if (a.date === b.date) {
+          return (Number(a.id)||0) - (Number(b.id)||0);
+        }
+        return a.date < b.date ? -1 : 1;
+      });
+
+      var series = [];
+      var eq = START_BALANCE;
+      series.push({ value: eq });
+
+      for (var i=0; i<sorted.length; i++) {
+        var pl = Number(sorted[i].result) || 0;
+        eq += pl;
+        series.push({ value: eq });
+      }
+
+      if (series.length < 2) {
+        series.push({ value: eq });
+      }
+
+      return series;
+    }
+
+    function renderEquityChart() {
+      if (!equityCanvas) return;
+
+      var wrapper = equityCanvas.parentElement;
+      var dpr = window.devicePixelRatio || 1;
+      var width = wrapper.clientWidth || 600;
+      var height = wrapper.clientHeight || 220;
+
+      equityCanvas.width = width * dpr;
+      equityCanvas.height = height * dpr;
+      equityCanvas.style.width = width + "px";
+      equityCanvas.style.height = height + "px";
+
+      var ctx = equityCanvas.getContext("2d");
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      ctx.clearRect(0, 0, width, height);
+
+      var series = getEquitySeries();
+      var values = series.map(function(p){ return p.value; });
+      var min = Math.min.apply(null, values);
+      var max = Math.max.apply(null, values);
+      if (min === max) {
+        min -= 50;
+        max += 50;
+      }
+
+      var paddingLeft = 20;
+      var paddingRight = 12;
+      var paddingTop = 16;
+      var paddingBottom = 18;
+      var chartW = width - paddingLeft - paddingRight;
+      var chartH = height - paddingTop - paddingBottom;
+
+      function yFor(v) {
+        return paddingTop + (max - v) * chartH / (max - min);
+      }
+      function xFor(i) {
+        if (series.length <= 1) return paddingLeft + chartW/2;
+        var step = chartW / (series.length - 1);
+        return paddingLeft + step * i;
+      }
+
+      // grid
+      ctx.strokeStyle = "rgba(148,163,184,0.25)";
+      ctx.lineWidth = 1;
+      ctx.setLineDash([4, 4]);
+      ctx.beginPath();
+      ctx.moveTo(paddingLeft, yFor(min));
+      ctx.lineTo(width-paddingRight, yFor(min));
+      ctx.moveTo(paddingLeft, yFor(max));
+      ctx.lineTo(width-paddingRight, yFor(max));
+      ctx.stroke();
+      ctx.setLineDash([]);
+
+      // equity line
+      ctx.beginPath();
+      for (var i=0; i<series.length; i++) {
+        var x = xFor(i);
+        var y = yFor(series[i].value);
+        if (i===0) ctx.moveTo(x,y);
+        else ctx.lineTo(x,y);
+      }
+      var gradient = ctx.createLinearGradient(paddingLeft, paddingTop, width-paddingRight, paddingTop);
+      gradient.addColorStop(0, "rgba(59,130,246,0.4)");
+      gradient.addColorStop(1, "rgba(34,197,94,0.85)");
+      ctx.strokeStyle = gradient;
+      ctx.lineWidth = 2;
+      ctx.stroke();
+
+      // fill under line
+      ctx.beginPath();
+      for (var j=0; j<series.length; j++) {
+        var x2 = xFor(j);
+        var y2 = yFor(series[j].value);
+        if (j===0) ctx.moveTo(x2,y2);
+        else ctx.lineTo(x2,y2);
+      }
+      ctx.lineTo(xFor(series.length-1), height-paddingBottom);
+      ctx.lineTo(xFor(0), height-paddingBottom);
+      ctx.closePath();
+      var fillGrad = ctx.createLinearGradient(0, paddingTop, 0, height-paddingBottom);
+      fillGrad.addColorStop(0, "rgba(34,197,94,0.25)");
+      fillGrad.addColorStop(1, "rgba(15,23,42,0.0)");
+      ctx.fillStyle = fillGrad;
+      ctx.fill();
+
+      // fake candles
+      for (var k=1; k<series.length; k++) {
+        var open = series[k-1].value;
+        var close = series[k].value;
+        var high = Math.max(open, close);
+        var low  = Math.min(open, close);
+
+        var x = xFor(k);
+        var yHigh = yFor(high);
+        var yLow  = yFor(low);
+        var yOpen = yFor(open);
+        var yClose= yFor(close);
+
+        var isUp = close >= open;
+        ctx.strokeStyle = isUp ? "#4ade80" : "#fb7185";
+        ctx.lineWidth = 1.2;
+
+        ctx.beginPath();
+        ctx.moveTo(x, yHigh);
+        ctx.lineTo(x, yLow);
+        ctx.stroke();
+
+        var bodyWidth = 6;
+        var topY = Math.min(yOpen, yClose);
+        var bodyH = Math.max(Math.abs(yClose - yOpen), 2);
+        ctx.fillStyle = isUp ? "rgba(34,197,94,0.9)" : "rgba(248,113,113,0.9)";
+        ctx.fillRect(x - bodyWidth/2, topY, bodyWidth, bodyH);
+      }
+
+      // labels
+      var last = series[series.length-1].value;
+      var change = last - START_BALANCE;
+      if (equityStartEl)   equityStartEl.textContent   = "$" + formatNumber(START_BALANCE);
+      if (equityBalanceEl) equityBalanceEl.textContent = "$" + formatNumber(last);
+      if (equityChangeEl) {
+        equityChangeEl.textContent = (change>0?"+":"") + formatNumber(change);
+        equityChangeEl.classList.remove("equity-change-pos","equity-change-neg");
+        if (change>0) equityChangeEl.classList.add("equity-change-pos");
+        if (change<0) equityChangeEl.classList.add("equity-change-neg");
+      }
+    }
+
+    window.addEventListener("resize", function(){
+      renderEquityChart();
+    });
+
+    // ------------- MASTER RENDER ------------
+    function renderAll() {
+      renderStats();
+      renderRows();
+      renderNotebook();
+      renderCalendar();
+      renderEquityChart();
+    }
+
+    renderAll();
+  </script>
+</body>
+</html>
